@@ -7,7 +7,7 @@ STDOUT.sync = true # DO NOT REMOVE
 @w, @h = gets.split(" ").collect {|x| x.to_i}
 @n = gets.to_i # maximum number of turns before game over.
 @x0, @y0 = gets.split(" ").collect {|x| x.to_i}
-@here = { x:@x0, y:@y0 }
+@current_location = { x:@x0, y:@y0 }
 @limits = { leftmost:0, riightmost:@w, top:0, bottom:@h }
 
 def moving(max, min)
@@ -25,28 +25,28 @@ loop do
     # Write an action using puts
     # To debug: STDERR.puts "Debug messages..."
     if bomb_dir.index('U') 
-        @limits[:bottom] = @here[:y]
+        @limits[:bottom] = @current_location[:y]
         bottom = 0 < @limits[:top] ? @limits[:top] : 0
-        @here[:y] -= moving( @here[:y], bottom ) 
+        @current_location[:y] -= moving( @current_location[:y], bottom ) 
     
     elsif bomb_dir.index('D')
-        @limits[:top] = @here[:y]
+        @limits[:top] = @current_location[:y]
         top = @limits[:bottom] < @h ? @limits[:bottom] : @h
-        @here[:y] += moving( top, @here[:y] )
+        @current_location[:y] += moving( top, @current_location[:y] )
     end
     
     if bomb_dir.index('L') 
-        @limits[:riightmost] = @here[:x]
+        @limits[:riightmost] = @current_location[:x]
         leftmost = 0 < @limits[:leftmost] ? @limits[:leftmost]  : 0
-        @here[:x] -= moving( @here[:x], leftmost)
+        @current_location[:x] -= moving( @current_location[:x], leftmost)
     
     elsif bomb_dir.index('R')
-        @limits[:leftmost] = @here[:x]
+        @limits[:leftmost] = @current_location[:x]
         rightmost = @limits[:riightmost] < @w ? @limits[:riightmost] : @w
-        @here[:x] += moving( rightmost, @here[:x])
+        @current_location[:x] += moving( rightmost, @current_location[:x])
     end
 
     # the location of the next window Batman should jump to.
-    puts "#{@here[:x]} #{@here[:y]}"
+    puts "#{@current_location[:x]} #{@current_location[:y]}"
     
 end
