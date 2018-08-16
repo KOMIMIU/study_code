@@ -7,15 +7,15 @@ STDOUT.sync = true # DO NOT REMOVE
 @w, @h = gets.split(" ").collect {|x| x.to_i}
 @n = gets.to_i # maximum number of turns before game over.
 @x0, @y0 = gets.split(" ").collect {|x| x.to_i}
-@now_hash = { x:@x0, y:@y0 }
-@check_hash = { xl:0, xr:@w, yu:0, yd:@h }
+@here = { x:@x0, y:@y0 }
+@limits = { leftmost:0, riightmost:@w, top:0, bottom:@h }
 
-def how_move(big, small)
+def moving(max, min)
     
-    ((big - small)/2)
+    #roundup
+    (max - min)/2 + (max - min)%2
     
 end
-
 
 # game loop
 loop do
@@ -25,26 +25,28 @@ loop do
     # Write an action using puts
     # To debug: STDERR.puts "Debug messages..."
     if bomb_dir.index('U') 
-        @check_hash[:yd] = @now_hash[:y] - 1
-        expectation = 0 < @check_hash[:yu] ? @check_hash[:yu]  : 0
-        @now_hash[:y] -= how_move( @now_hash[:y], expectation - 1 ) 
+        @limits[:bottom] = @here[:y]
+        bottom = 0 < @limits[:top] ? @limits[:top] : 0
+        @here[:y] -= moving( @here[:y], bottom ) 
+    
     elsif bomb_dir.index('D')
-        @check_hash[:yu] = @now_hash[:y] + 1
-        expectation = @check_hash[:yd] < @h ? @check_hash[:yd] : @h
-        @now_hash[:y] += how_move( expectation + 1, @now_hash[:y] )
+        @limits[:top] = @here[:y]
+        top = @limits[:bottom] < @h ? @limits[:bottom] : @h
+        @here[:y] += moving( top, @here[:y] )
     end
     
     if bomb_dir.index('L') 
-        @check_hash[:xr] = @now_hash[:x] - 1
-        expectation = 0 < @check_hash[:xl] ? @check_hash[:xl]  : 0
-        @now_hash[:x] -= how_move( @now_hash[:x], expectation - 1)
-    elsif  bomb_dir.index('R')
-        @check_hash[:xl] = @now_hash[:x] + 1
-        expectation = @check_hash[:xr] < @w ? @check_hash[:xr] : @w
-        @now_hash[:x] += how_move( expectation + 1, @now_hash[:x])
+        @limits[:riightmost] = @here[:x]
+        leftmost = 0 < @limits[:leftmost] ? @limits[:leftmost]  : 0
+        @here[:x] -= moving( @here[:x], leftmost)
+    
+    elsif bomb_dir.index('R')
+        @limits[:leftmost] = @here[:x]
+        rightmost = @limits[:riightmost] < @w ? @limits[:riightmost] : @w
+        @here[:x] += moving( rightmost, @here[:x])
     end
 
     # the location of the next window Batman should jump to.
-    puts "#{@now_hash[:x]} #{@now_hash[:y]}"
+    puts "#{@here[:x]} #{@here[:y]}"
     
 end
